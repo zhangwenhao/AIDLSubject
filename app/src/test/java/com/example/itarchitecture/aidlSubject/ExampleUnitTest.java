@@ -1,4 +1,4 @@
-package com.example.itarchitecture.aidlsubject;
+package com.example.itarchitecture.aidlSubject;
 
 import org.junit.Test;
 

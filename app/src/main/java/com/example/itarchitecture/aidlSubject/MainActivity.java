@@ -1,4 +1,4 @@
-package com.example.itarchitecture.aidlsubject;
+package com.example.itarchitecture.aidlSubject;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

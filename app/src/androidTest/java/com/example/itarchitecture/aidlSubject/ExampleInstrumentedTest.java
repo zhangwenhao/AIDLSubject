@@ -1,4 +1,4 @@
-package com.example.itarchitecture.aidlsubject;
+package com.example.itarchitecture.aidlSubject;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

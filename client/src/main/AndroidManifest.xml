@@ -12,16 +12,9 @@
         <activity android:name="com.example.itarchitecture.aidlSubject.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name="com.example.itarchitecture.aidlSubject.AddRemindService">
-            <intent-filter>
-                <action android:name="android.intent.action.REMINDER"/>
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>
