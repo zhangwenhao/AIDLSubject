@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,12 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private AlertDialog alertDialog;
     private ItemListAdapter itemListAdapter;
-
     private List<InfoEntity> infoEntities=new ArrayList<>();
-
     private AtomicInteger atomicInteger = new AtomicInteger(0);
+    public static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.getDefault());
 
-    public static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,11 +91,13 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Log.i("service","disconnected");
             iRemind = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.i("service","Connected");
             // Stub.asInterface, get interface
             iRemind = IRemind.Stub.asInterface(service);
         }
@@ -122,13 +124,16 @@ public class MainActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
-                    InfoEntity infoEntity = new InfoEntity();
-                    infoEntity.setId(id);
-                    int position=infoEntities.indexOf(infoEntity);
-                    if(position>-1){
-                        infoEntity=infoEntities.get(position);
-                    }
+            try{
+                InfoEntity infoEntity = new InfoEntity();
+                infoEntity.setId(id);
+                int position=infoEntities.indexOf(infoEntity);
+                if(position>-1){
+                    infoEntity=infoEntities.get(position);
+                }
+                if(editContent.getText()==null||editContent.getText().toString().trim().equals("")||editDate.getText()==null||editDate.getText().toString().trim().equals("")){
+                    Toast.makeText(getApplicationContext(), "Please input data",Toast.LENGTH_SHORT).show();
+                }else{
                     infoEntity.setContent(editContent.getText().toString());
                     Date inputDate=formatter.parse(editDate.getText().toString());
                     infoEntity.setDateTime(inputDate.getTime());
@@ -136,12 +141,13 @@ public class MainActivity extends AppCompatActivity {
                         infoEntities.add(infoEntity);
                     }
                     iRemind.sendInfo(infoEntity);
-                }catch(Exception e){
-                    e.printStackTrace();
+                    itemListAdapter.notifyDataSetChanged();
+                    alertDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "Success",Toast.LENGTH_LONG).show();
                 }
-                itemListAdapter.notifyDataSetChanged();
-                alertDialog.dismiss();
-                Toast.makeText(getApplicationContext(), "Success",Toast.LENGTH_LONG).show();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
             }
         });
         btnCancel.setOnClickListener(new View.OnClickListener() {
