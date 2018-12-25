@@ -16,6 +16,7 @@ import com.example.itarchitecture.aidl.InfoEntity;
 import com.example.itarchitecture.aidl.RemindService;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private AlarmManager alarmManager;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
+    private AlertDialog alertDialog;
     //save the current reminders
     private List<InfoEntity> reminders=new ArrayList<>();
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initData();
         //init view
         recyclerView=findViewById(R.id.recycle_view);
         //init the alarmManager service
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 items[cnt]=infoEntity.getContent();
                 cnt++;
             }
-            final AlertDialog alertDialog = new AlertDialog.Builder(this)
+            alertDialog = new AlertDialog.Builder(this)
                     .setTitle("Please Check to Remind")
                     .setIcon(R.mipmap.ic_launcher)
                     .setMultiChoiceItems(items, chosen, new DialogInterface.OnMultiChoiceClickListener() {
@@ -79,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             RemindService.infoEntities.clear();
+                            alertDialog.dismiss();
                             Toast.makeText(MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -86,11 +90,13 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             RemindService.infoEntities.clear();
+                            alertDialog.dismiss();
                         }
                     })
                     .setNeutralButton("Later", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            alertDialog.dismiss();
                         }
                     })
                     .create();
@@ -102,22 +108,25 @@ public class MainActivity extends AppCompatActivity {
      * check info and remove when it is expired
      */
     private void checkAlarmInfo(){
-        for (InfoEntity infoEntity : RemindService.infoEntities) {
+        Iterator<InfoEntity> infoEntitiesIterator=RemindService.infoEntities.iterator();
+        while (infoEntitiesIterator.hasNext()){
             long currentTime=System.currentTimeMillis();
-            if(currentTime>=infoEntity.getDateTime()){
-                RemindService.infoEntities.remove(infoEntity);
+            if(currentTime>=infoEntitiesIterator.next().getDateTime()){
+                infoEntitiesIterator.remove();
             }
         }
-        for (InfoEntity infoEntity : RemindService.cancelInfoEntities) {
+        Iterator<InfoEntity> cancelInfoEntitiesIterator=RemindService.cancelInfoEntities.iterator();
+        while (cancelInfoEntitiesIterator.hasNext()){
             long currentTime=System.currentTimeMillis();
-            if(currentTime>=infoEntity.getDateTime()){
-                RemindService.cancelInfoEntities.remove(infoEntity);
+            if(currentTime>=cancelInfoEntitiesIterator.next().getDateTime()){
+                cancelInfoEntitiesIterator.remove();
             }
         }
-        for (InfoEntity infoEntity : reminders) {
+        Iterator<InfoEntity> remindersIterator=reminders.iterator();
+        while (remindersIterator.hasNext()){
             long currentTime=System.currentTimeMillis();
-            if(currentTime>infoEntity.getDateTime()){
-                reminders.remove(infoEntity);
+            if(currentTime>remindersIterator.next().getDateTime()){
+                remindersIterator.remove();
             }
         }
     }
@@ -127,11 +136,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void cancelAlarm(){
         if(!RemindService.cancelInfoEntities.isEmpty()){
-            for (InfoEntity infoEntity : RemindService.cancelInfoEntities){
+            Iterator<InfoEntity> cancelInfoEntitiesIterator=RemindService.cancelInfoEntities.iterator();
+            while (cancelInfoEntitiesIterator.hasNext()){
                 Intent intent = new Intent(MainActivity.this,ReminderActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(MainActivity.this,infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pi = PendingIntent.getActivity(MainActivity.this,cancelInfoEntitiesIterator.next().getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.cancel(pi);
-                reminders.remove(infoEntity);
+                cancelInfoEntitiesIterator.remove();
+                recyclerAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -147,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         alarmManager.set(AlarmManager.RTC_WAKEUP,infoEntity.getDateTime(), pi);
         if(!reminders.contains(infoEntity)){
             reminders.add(infoEntity);
+            recyclerAdapter.notifyDataSetChanged();
         }
     }
 
@@ -163,6 +175,15 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.scrollToPosition(pos);
             }
         });
+    }
 
+    private void initData(){
+        for (int i=1; i<=10; i++){
+            InfoEntity infoEntity=new InfoEntity();
+            infoEntity.setId(i);
+            infoEntity.setContent("this is a test "+i);
+            infoEntity.setDateTime(System.currentTimeMillis()+10000*i);
+            RemindService.infoEntities.add(infoEntity);
+        }
     }
 }
