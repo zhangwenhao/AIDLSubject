@@ -21,7 +21,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private  AlarmManager alarmManager;
+    private AlarmManager alarmManager;
     private RecyclerView recyclerView;
     private RecyclerAdapter recyclerAdapter;
     //save the current reminders
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         if(!RemindService.cancelInfoEntities.isEmpty()){
             for (InfoEntity infoEntity : RemindService.cancelInfoEntities){
                 Intent intent = new Intent(MainActivity.this,ReminderActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(MainActivity.this, infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pi = PendingIntent.getActivity(MainActivity.this,infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.cancel(pi);
                 reminders.remove(infoEntity);
             }

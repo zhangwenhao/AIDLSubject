@@ -28,7 +28,7 @@ public class RemindService extends Service {
 
     private final IRemind.Stub mBinder=new IRemind.Stub() {
         @Override
-        public void sendInfo(InfoEntity infoEntity) throws RemoteException {
+        public void sendInfo(InfoEntity infoEntity){
            String appName=getPackageManager().getNameForUid(Binder.getCallingUid());
            appName=appName==null?"unknown App":appName;
            infoEntity.setId(appName.hashCode()+infoEntity.getId());
@@ -37,11 +37,10 @@ public class RemindService extends Service {
         }
 
         @Override
-        public void cancelInfo(InfoEntity infoEntity) throws RemoteException {
+        public void cancelInfo(InfoEntity infoEntity){
             String appName=getPackageManager().getNameForUid(Binder.getCallingUid());
             appName=appName==null?"unknown App":appName;
             infoEntity.setId(appName.hashCode()+infoEntity.getId());
-            infoEntity.setContent(appName+infoEntity.getContent());
             cancelInfoEntities.add(infoEntity);
         }
     };
