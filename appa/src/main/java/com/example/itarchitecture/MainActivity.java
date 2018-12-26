@@ -12,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.example.itarchitecture.aidl.IRemind;
 import com.example.itarchitecture.aidl.InfoEntity;
 import com.example.itarchitecture.aidl.RemindService;
 
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initData();
+        //initData();
         //init view
         recyclerView=findViewById(R.id.recycle_view);
         //init the alarmManager service
