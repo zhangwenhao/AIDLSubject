@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d("AIDL_Client","onCreate");
         bindService();
         listView=findViewById(R.id.list_view_items);
         setAdapter();
@@ -84,20 +85,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private void bindService(){
         Intent intent = new Intent("android.intent.action.REMIND_SERVICE");
-        intent.setPackage("com.example.itarchitecture.aidl");
+        intent.setPackage("com.example.itarchitecture.appa");
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Log.i("service","disconnected");
+            Log.d("AIDL_Client","disconnected");
             iRemind = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.i("service","Connected");
+            Log.d("AIDL_Client","Connected");
             // Stub.asInterface, get interface
             iRemind = IRemind.Stub.asInterface(service);
         }

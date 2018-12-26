@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.example.itarchitecture.aidl.IRemind;
 import com.example.itarchitecture.aidl.InfoEntity;
 import com.example.itarchitecture.aidl.RemindService;
 
@@ -138,10 +139,12 @@ public class MainActivity extends AppCompatActivity {
         if(!RemindService.cancelInfoEntities.isEmpty()){
             Iterator<InfoEntity> cancelInfoEntitiesIterator=RemindService.cancelInfoEntities.iterator();
             while (cancelInfoEntitiesIterator.hasNext()){
+                InfoEntity infoEntity=cancelInfoEntitiesIterator.next();
                 Intent intent = new Intent(MainActivity.this,ReminderActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(MainActivity.this,cancelInfoEntitiesIterator.next().getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent pi = PendingIntent.getActivity(MainActivity.this,infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.cancel(pi);
                 cancelInfoEntitiesIterator.remove();
+                reminders.remove(infoEntity);
                 recyclerAdapter.notifyDataSetChanged();
             }
         }
@@ -156,10 +159,13 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("info",infoEntity.getContent());
         PendingIntent pi = PendingIntent.getActivity(MainActivity.this, infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.set(AlarmManager.RTC_WAKEUP,infoEntity.getDateTime(), pi);
-        if(!reminders.contains(infoEntity)){
+        int index=reminders.indexOf(infoEntity);
+        if(index!=-1){
+            reminders.set(index,infoEntity);
+        }else{
             reminders.add(infoEntity);
-            recyclerAdapter.notifyDataSetChanged();
         }
+        recyclerAdapter.notifyDataSetChanged();
     }
 
     /**

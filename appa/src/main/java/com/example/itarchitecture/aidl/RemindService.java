@@ -28,16 +28,16 @@ public class RemindService extends Service {
         @Override
         public void sendInfo(InfoEntity infoEntity){
            String appName=getPackageManager().getNameForUid(Binder.getCallingUid());
-           appName=appName==null?"unknown App":appName;
+           appName=appName==null?"unknown App-":appName.substring(appName.lastIndexOf(".")+1);
            infoEntity.setId(appName.hashCode()+infoEntity.getId());
-           infoEntity.setContent(appName+infoEntity.getContent());
+           infoEntity.setContent(appName+": "+infoEntity.getContent());
            infoEntities.add(infoEntity);
         }
 
         @Override
         public void cancelInfo(InfoEntity infoEntity){
             String appName=getPackageManager().getNameForUid(Binder.getCallingUid());
-            appName=appName==null?"unknown App":appName;
+            appName=appName==null?"unknown App":appName.substring(appName.lastIndexOf(".")+1);
             infoEntity.setId(appName.hashCode()+infoEntity.getId());
             cancelInfoEntities.add(infoEntity);
         }
