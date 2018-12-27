@@ -4,6 +4,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class RemindService extends Service {
     private final IRemind.Stub mBinder=new IRemind.Stub() {
         @Override
         public void sendInfo(InfoEntity infoEntity){
+           Log.d("AIDL_Server","received info");
            String appName=getPackageManager().getNameForUid(Binder.getCallingUid());
            appName=appName==null?"unknown App-":appName.substring(appName.lastIndexOf(".")+1);
            infoEntity.setId(appName.hashCode()+infoEntity.getId());
@@ -36,6 +39,7 @@ public class RemindService extends Service {
 
         @Override
         public void cancelInfo(InfoEntity infoEntity){
+            Log.d("AIDL_Server","received cancelInfo");
             String appName=getPackageManager().getNameForUid(Binder.getCallingUid());
             appName=appName==null?"unknown App":appName.substring(appName.lastIndexOf(".")+1);
             infoEntity.setId(appName.hashCode()+infoEntity.getId());

@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         //initData();
         //init view
         recyclerView=findViewById(R.id.recycle_view);
+        setData();
         //init the alarmManager service
         alarmManager= (AlarmManager) getSystemService( Service.ALARM_SERVICE);
     }
@@ -47,9 +48,23 @@ public class MainActivity extends AppCompatActivity {
         checkAlarmInfo();
         //delete alarm info if other apps deleted the info
         cancelAlarm();
+        //update alarm info if other apps update the info
+        updateItemsInfo();
         //remind current alarm info from other apps
         showItemsInfo();
-        setData();
+    }
+
+    public void updateItemsInfo(){
+        if(!RemindService.infoEntities.isEmpty()) {
+            Iterator<InfoEntity> infoEntitiesIterator=RemindService.infoEntities.iterator();
+            while (infoEntitiesIterator.hasNext()){
+                InfoEntity infoEntity=infoEntitiesIterator.next();
+                if(reminders.contains(infoEntity)){
+                    infoEntitiesIterator.remove();
+                    addAlarm(infoEntity);
+                }
+            }
+        }
     }
 
     /**
@@ -61,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
             final boolean chosen[] = new boolean[RemindService.infoEntities.size()];
             int cnt=0;
             for (InfoEntity infoEntity : RemindService.infoEntities) {
-                items[cnt]=infoEntity.getContent();
+                String content=infoEntity.getContent();
+                items[cnt]=content.length()>=20?content.substring(0,20)+"...":content;
                 cnt++;
             }
             alertDialog = new AlertDialog.Builder(this)
@@ -115,18 +131,12 @@ public class MainActivity extends AppCompatActivity {
                 infoEntitiesIterator.remove();
             }
         }
-        Iterator<InfoEntity> cancelInfoEntitiesIterator=RemindService.cancelInfoEntities.iterator();
-        while (cancelInfoEntitiesIterator.hasNext()){
-            long currentTime=System.currentTimeMillis();
-            if(currentTime>=cancelInfoEntitiesIterator.next().getDateTime()){
-                cancelInfoEntitiesIterator.remove();
-            }
-        }
         Iterator<InfoEntity> remindersIterator=reminders.iterator();
         while (remindersIterator.hasNext()){
             long currentTime=System.currentTimeMillis();
             if(currentTime>remindersIterator.next().getDateTime()){
                 remindersIterator.remove();
+                recyclerAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -139,12 +149,14 @@ public class MainActivity extends AppCompatActivity {
             Iterator<InfoEntity> cancelInfoEntitiesIterator=RemindService.cancelInfoEntities.iterator();
             while (cancelInfoEntitiesIterator.hasNext()){
                 InfoEntity infoEntity=cancelInfoEntitiesIterator.next();
-                Intent intent = new Intent(MainActivity.this,ReminderActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(MainActivity.this,infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                alarmManager.cancel(pi);
                 cancelInfoEntitiesIterator.remove();
-                reminders.remove(infoEntity);
-                recyclerAdapter.notifyDataSetChanged();
+                boolean flag=reminders.remove(infoEntity);
+                if(flag){
+                    recyclerAdapter.notifyDataSetChanged();
+                    Intent intent = new Intent(MainActivity.this,ReminderActivity.class);
+                    PendingIntent pi = PendingIntent.getActivity(MainActivity.this,infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    alarmManager.cancel(pi);
+                }
             }
         }
     }
