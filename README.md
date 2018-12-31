@@ -11,9 +11,9 @@ jdk 1.8, sdk 28.
 
 <div align=center>
   <h3>These are appb</h3>
-  <img width="35%" height="150" src="(sample/appb_01.png)" style="margin-right:10%"/>
-  <img width="35%" height="150" src="(sample/appb_02.png)"/></br>
-  <img width="150" height="150" src="(sample/appb_03.png)" style="margin-right:10%"/>
-  <img width="150" height="150" src="(sample/appb_04.png)"/>
+  <img width="40%" height="400" src="sample/appb_01.png"/>
+  <img width="40%" height="400" src="sample/appb_02.png"/></br>
+  <img width="40%" height="400" src="sample/appb_03.png"/>
+  <img width="40%" height="400" src="sample/appb_04.png"/>
 </div>
 
