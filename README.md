@@ -7,9 +7,13 @@ jdk 1.8, sdk 28.
 
 ***
 ## samples
-These are appb
-![appb_01](sample/appb_01.png)![appb_02](sample/appb_02.png)
-![appb_03](sample/appb_03.png)![appb_04](sample/appb_04.png)
-These are appa 
-![appa_01](sample/appa_01.png)![appa_02](sample/appa_02.png)
-![appa_03](sample/appa_03.png)
+
+
+<div align=center>
+  <h3>These are appb</h3>
+  <img width="35%" height="150" src="(sample/appb_01.png)" style="margin-right:10%"/>
+  <img width="35%" height="150" src="(sample/appb_02.png)"/></br>
+  <img width="150" height="150" src="(sample/appb_03.png)" style="margin-right:10%"/>
+  <img width="150" height="150" src="(sample/appb_04.png)"/>
+</div>
+
