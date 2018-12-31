@@ -8,8 +8,8 @@ jdk 1.8, sdk 28.
 ***
 ## samples
 These are appb
-![appb_01](AIDLSubject/tree/master/sample/appb_01.png)![appb_02](AIDLSubject/tree/master/sample/appb_02.png)
-![appb_03](AIDLSubject/tree/master/sample/appb_03.png)![appb_04](AIDLSubject/tree/master/sample/appb_04.png)
+![appb_01](sample/appb_01.png)![appb_02](sample/appb_02.png)
+![appb_03](sample/appb_03.png)![appb_04](sample/appb_04.png)
 These are appa 
-![appa_01](AIDLSubject/sample/appa_01.png)![appa_02](AIDLSubject/sample/appa_02.png)
-![appa_03](AIDLSubject/sample/appa_03.png)
+![appa_01](sample/appa_01.png)![appa_02](sample/appa_02.png)
+![appa_03](sample/appa_03.png)
