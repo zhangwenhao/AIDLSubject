@@ -26,7 +26,9 @@ import com.example.itarchitecture.aidl.InfoEntity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -119,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
             TextView date=view.findViewById(R.id.txt_info_date);
             editDate.setText(date.getText());
             editContent.setText(content.getText());
+        }else{
+            editDate.setText(formatter.format(System.currentTimeMillis()));
         }
         Button btnConfirm=contentView.findViewById(R.id.btn_confirm);
         Button btnCancel =contentView.findViewById(R.id.btn_cancel);
@@ -146,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     alertDialog.dismiss();
                     Toast.makeText(getApplicationContext(), "Success",Toast.LENGTH_LONG).show();
                 }
+                sortByTime();
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -195,6 +200,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    private void sortByTime(){
+        infoEntities.sort(new Comparator<InfoEntity>() {
+            @Override
+            public int compare(InfoEntity o1, InfoEntity o2) {
+                if(o1.getDateTime()>o2.getDateTime()){
+                    return 1;
+                }else{
+                    return -1;
+                }
+            }
+        });
     }
 }
 

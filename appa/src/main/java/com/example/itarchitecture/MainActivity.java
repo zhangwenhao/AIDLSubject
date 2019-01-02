@@ -16,6 +16,7 @@ import com.example.itarchitecture.aidl.InfoEntity;
 import com.example.itarchitecture.aidl.RemindService;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,9 +35,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //initData();
-        //init view
-        recyclerView=findViewById(R.id.recycle_view);
-        setData();
+        //init view and adapter
+        setViewAndAdapter();
         //init the alarmManager service
         alarmManager= (AlarmManager) getSystemService( Service.ALARM_SERVICE);
     }
@@ -45,26 +45,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         //check alarm info to remove from list if it was expired
-        checkAlarmInfo();
         //delete alarm info if other apps deleted the info
-        cancelAlarm();
         //update alarm info if other apps update the info
-        updateItemsInfo();
+        boolean flag=false;
+        if(checkAlarmInfo()|cancelAlarm()|updateItemsInfo()){
+            flag=true;
+        }
+        if(flag){
+           recyclerAdapter.notifyDataSetChanged();
+        }
         //remind current alarm info from other apps
         showItemsInfo();
     }
 
-    public void updateItemsInfo(){
+    public boolean updateItemsInfo(){
+        boolean flag=false;
         if(!RemindService.infoEntities.isEmpty()) {
             Iterator<InfoEntity> infoEntitiesIterator=RemindService.infoEntities.iterator();
             while (infoEntitiesIterator.hasNext()){
                 InfoEntity infoEntity=infoEntitiesIterator.next();
                 if(reminders.contains(infoEntity)){
+                    flag=true;
                     infoEntitiesIterator.remove();
                     addAlarm(infoEntity);
                 }
             }
         }
+        if(flag){
+            sortByTime();
+        }
+        return flag;
     }
 
     /**
@@ -92,10 +102,16 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("Complete", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            boolean flag=false;
                             for (int j = 0; j < chosen.length; j++) {
                                 if (chosen[j]) {
+                                    flag=true;
                                     addAlarm(RemindService.infoEntities.get(j));
                                 }
+                            }
+                            if(flag){
+                                sortByTime();
+                                recyclerAdapter.notifyDataSetChanged();
                             }
                             RemindService.infoEntities.clear();
                             alertDialog.dismiss();
@@ -123,7 +139,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * check info and remove when it is expired
      */
-    private void checkAlarmInfo(){
+    private boolean checkAlarmInfo(){
+        boolean flag=false;
         Iterator<InfoEntity> infoEntitiesIterator=RemindService.infoEntities.iterator();
         while (infoEntitiesIterator.hasNext()){
             long currentTime=System.currentTimeMillis();
@@ -136,29 +153,32 @@ public class MainActivity extends AppCompatActivity {
             long currentTime=System.currentTimeMillis();
             if(currentTime>remindersIterator.next().getDateTime()){
                 remindersIterator.remove();
-                recyclerAdapter.notifyDataSetChanged();
+                flag=true;
             }
         }
+        return flag;
     }
 
     /**
      * remove alarm timed task
      */
-    private void cancelAlarm(){
+    private boolean cancelAlarm(){
+        boolean flag=false;
         if(!RemindService.cancelInfoEntities.isEmpty()){
             Iterator<InfoEntity> cancelInfoEntitiesIterator=RemindService.cancelInfoEntities.iterator();
             while (cancelInfoEntitiesIterator.hasNext()){
                 InfoEntity infoEntity=cancelInfoEntitiesIterator.next();
                 cancelInfoEntitiesIterator.remove();
-                boolean flag=reminders.remove(infoEntity);
-                if(flag){
-                    recyclerAdapter.notifyDataSetChanged();
+                boolean removeSuccess=reminders.remove(infoEntity);
+                if(removeSuccess){
+                    flag=true;
                     Intent intent = new Intent(MainActivity.this,ReminderActivity.class);
                     PendingIntent pi = PendingIntent.getActivity(MainActivity.this,infoEntity.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     alarmManager.cancel(pi);
                 }
             }
         }
+        return flag;
     }
 
     /**
@@ -176,20 +196,28 @@ public class MainActivity extends AppCompatActivity {
         }else{
             reminders.add(infoEntity);
         }
-        recyclerAdapter.notifyDataSetChanged();
+
     }
 
     /**
-     * init view and set scroll event
+     * init view
      */
-    private void setData(){
+    private void setViewAndAdapter(){
+        recyclerView=findViewById(R.id.recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerAdapter=new RecyclerAdapter(this,reminders);
         recyclerView.setAdapter(recyclerAdapter);
-        recyclerAdapter.setOnScrollListener(new RecyclerAdapter.OnScrollListener() {
+    }
+
+    private void sortByTime(){
+        reminders.sort(new Comparator<InfoEntity>() {
             @Override
-            public void scrollTo(int pos) {
-            recyclerView.scrollToPosition(pos);
+            public int compare(InfoEntity o1, InfoEntity o2) {
+                if(o1.getDateTime()>o2.getDateTime()){
+                    return 1;
+                }else{
+                    return -1;
+                }
             }
         });
     }

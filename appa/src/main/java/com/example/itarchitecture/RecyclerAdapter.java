@@ -25,7 +25,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Remind
     private Context context;
     private List<InfoEntity> infoEntities;
     private LayoutInflater mInflater;
-    private OnScrollListener mOnScrollListener;
 
     public RecyclerAdapter(Context context, List<InfoEntity> infoEntities) {
         this.context = context;
@@ -41,23 +40,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Remind
 
     @Override
     public void onBindViewHolder(@NonNull ReminderHolder reminderHolder, int i) {
-        reminderHolder.bindView(infoEntities.get(i));
+        reminderHolder.bindView(infoEntities.get(i),i);
     }
 
     @Override
     public int getItemCount() {
         return infoEntities.size();
-    }
-
-    /**
-     * Rolling monitor interface
-     */
-    public interface OnScrollListener{
-        void scrollTo(int pos);
-    }
-
-    public void setOnScrollListener(OnScrollListener onScrollListener){
-        this.mOnScrollListener = onScrollListener;
     }
 
     public static class ReminderHolder extends RecyclerView.ViewHolder{
@@ -73,8 +61,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Remind
             belowTextView=itemView.findViewById(R.id.textViewBelow);
         }
 
-        public void bindView(InfoEntity infoEntity){
-            switch (infoEntity.getId()%4){
+        public void bindView(InfoEntity infoEntity,int i){
+            switch (i%4){
                 case 0:
                     imageView.setImageResource(R.mipmap.clock1);
                     break;
@@ -82,11 +70,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Remind
                     imageView.setImageResource(R.mipmap.clock2);
                     break;
                 case 2:
-                     imageView.setImageResource(R.mipmap.clock3);
+                    imageView.setImageResource(R.mipmap.clock3);
                     break;
-                 default:
-                     imageView.setImageResource(R.mipmap.clock4);
-                     break;
+                default:
+                    imageView.setImageResource(R.mipmap.clock4);
+                    break;
             }
             upTextView.setText(infoEntity.getContent());
             belowTextView.setText(dateFormat.format(infoEntity.getDateTime()));
